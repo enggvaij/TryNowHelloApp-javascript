@@ -1,12 +1,12 @@
 import '@servicenow/sdk/global'
-import { BusinessRule, ClientScript } from '@servicenow/sdk/core'
+import { BusinessRule, ClientScript, Table, DateColumn, StringColumn } from '@servicenow/sdk/core'
 import { showStateUpdate } from '../server/script'
 
 // creates a client script that pops up 'Table loaded successfully!!' message every time todo record is loaded
 ClientScript({
     $id: Now.ID['cs0'],
     name: 'my_client_script',
-    table: 'incident',
+    table: 'x_2287848_hellonow_to_do',
     active: true,
     applies_extended: false,
     global: true,
@@ -24,10 +24,31 @@ ClientScript({
 BusinessRule({
     $id: Now.ID['br0'],
     action: ['update'],
-    table: 'incident',
+    table: 'x_2287848_hellonow_to_do',
     script: showStateUpdate,
     name: 'LogStateChange',
     order: 100,
     when: 'after',
     active: true,
+})
+
+export const x_2287848_hellonow_to_do = Table({
+    name: 'x_2287848_hellonow_to_do',
+    label: 'To-do Items',
+    extends: 'task',
+    schema: {
+        deadline: DateColumn({ label: 'Deadline', maxLength: 40 }),
+        matrix: StringColumn({
+            label: 'Matrix',
+            choices: {
+                do: { label: 'Urgent and Important' },
+                decide: { label: 'Important but Not Urgent' },
+                delegate: { label: 'Urgent but Not Important' },
+                delete: { label: 'Neither Urgent nor Important' },
+            },
+            maxLength: 40,
+        }),
+        task: StringColumn({ label: 'To Do', maxLength: 120 }),
+    },
+    dbObjectId: true,
 })
